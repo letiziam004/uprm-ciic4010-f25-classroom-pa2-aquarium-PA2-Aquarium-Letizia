@@ -10,11 +10,51 @@ void Creature::normalize() {
         m_dy /= length;
     }
 }
-
+void Creature::moveBy(float dx, float dy) {
+    // mueve y mantiene dentro de los bounds definidos con setBounds
+  m_x = ofClamp(m_x + dx, 0.f, m_width);
+  m_y = ofClamp(m_y + dy, 0.f, m_height);
+}
 void Creature::bounce() {
     // should implement boundary controls here
-}
 
+
+  bool hit = false;
+
+    // Rebote en los bordes horizontales
+    if (m_x < 0.f) {
+        m_x = 0.f;
+        m_dx = std::abs(m_dx); // Cambia dirección a la derecha
+        hit = true;
+    }
+    else if (m_x > m_width) {
+        m_x = m_width;
+        m_dx = -std::abs(m_dx); // Cambia dirección a la izquierda
+        hit = true;
+    }
+
+    // Rebote en los bordes verticales
+    if (m_y < 0.f) {
+        m_y = 0.f;
+        m_dy = std::abs(m_dy); // Cambia dirección hacia abajo
+        hit = true;
+    }
+    else if (m_y > m_height) {
+        m_y = m_height;
+        m_dy = -std::abs(m_dy); // Cambia dirección hacia arriba
+        hit = true;
+    }
+
+    // Normaliza dirección si hubo rebote
+    if (hit) {
+        float len = std::sqrt(m_dx * m_dx + m_dy * m_dy);
+        if (len > 0.0001f) {
+            m_dx /= len;
+            m_dy /= len;
+        }
+    }
+}
+    
 
 void GameEvent::print() const {
         
@@ -40,16 +80,24 @@ void GameEvent::print() const {
                 break;
             case GameEventType::NEW_LEVEL:
                 ofLogVerbose() << "New Game level" << std::endl;
+                break;
             default:
                 ofLogVerbose() << "Unknown event type." << std::endl;
                 break;
         }
-};
+}
 
 // collision detection between two creatures
 bool checkCollision(std::shared_ptr<Creature> a, std::shared_ptr<Creature> b) {
-    return false; 
-};
+    if (!a || !b) return false;
+
+    float dx = a->getX() - b->getX();
+    float dy = a->getY() - b->getY();
+    float combinedRadius = a->getCollisionRadius() + b->getCollisionRadius();
+
+    // distancia^2 <= (r1+r2)^2  →  hay colisión
+    return (dx*dx + dy*dy) <= (combinedRadius * combinedRadius);
+}
 
 
 string GameSceneKindToString(GameSceneKind t){
@@ -58,8 +106,9 @@ string GameSceneKindToString(GameSceneKind t){
         case GameSceneKind::GAME_INTRO: return "GAME_INTRO";
         case GameSceneKind::AQUARIUM_GAME: return "AQUARIUM_GAME";
         case GameSceneKind::GAME_OVER: return "GAME_OVER";
-    };
-};
+    }
+    return "";
+}
 
 std::shared_ptr<GameScene> GameSceneManager::GetScene(string name){
     if(!this->HasScenes()){return nullptr;}

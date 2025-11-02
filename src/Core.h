@@ -1,9 +1,11 @@
+#pragma once
+
 #include <iostream>
 #include <memory>
 #include <utility>
 #include <cmath>
 #include <algorithm>
-#include "ofMain.h"
+#include "ofMain.h" 
 
 
 class AwaitFrames {
@@ -98,6 +100,7 @@ public:
     int getValue() const { return m_value; }
 
     void setBounds(int w, int h);
+    void moveBy(float dx, float dy);
     void normalize();
     void bounce();
 };

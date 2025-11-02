@@ -5,6 +5,7 @@
 #include <iostream>
 #include <algorithm>
 #include "Core.h"
+#pragma once
 
 
 enum class AquariumCreatureType {
