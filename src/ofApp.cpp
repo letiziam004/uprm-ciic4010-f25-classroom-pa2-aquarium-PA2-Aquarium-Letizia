@@ -60,6 +60,11 @@ void ofApp::setup(){
     backgroundMusic.setLoop(true);
     backgroundMusic.setVolume(0.6f);
     backgroundMusic.play();
+    
+    // Load bite sound
+    biteSound.load("Sounds/Minecraft-Eating.wav");
+    biteSound.setMultiPlay(true); // Allow overlapping sounds
+    biteSound.setVolume(0.8f);
 }
 
 //--------------------------------------------------------------
@@ -76,6 +81,13 @@ void ofApp::update(){
             return;
         }
         
+        
+        if(gameScene->GetLastEvent() != nullptr && gameScene->GetLastEvent()->isCreatureRemovedEvent()){
+            ofLogNotice() << "Fish eaten!...";
+            biteSound.play();
+            
+            gameScene->SetLastEvent(std::make_shared<GameEvent>()); 
+        }
     }
 
     gameManager->UpdateActiveScene();

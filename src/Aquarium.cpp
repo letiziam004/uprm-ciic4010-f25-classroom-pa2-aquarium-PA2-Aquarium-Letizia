@@ -330,6 +330,8 @@ void AquariumGameScene::Update(){
             m_aquarium->removeCreature(B);
             m_player->addToScore(1, B->getValue());
 
+            m_lastEvent = std::make_shared<GameEvent>(GameEventType::CREATURE_REMOVED, m_player, B);
+
             // subir poder más lento (opcional: 50 en vez de 25)
             if (m_player->getScore() % 50 == 0) {
                 m_player->increasePower(1);

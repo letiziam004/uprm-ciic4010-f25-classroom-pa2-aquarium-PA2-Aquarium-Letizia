@@ -1,11 +1,10 @@
+#pragma once
 #define NOMINMAX // To avoid min/max macro conflict on Windows
-
 #include <vector>
 #include <memory>
 #include <iostream>
 #include <algorithm>
 #include "Core.h"
-#pragma once
 
 
 enum class AquariumCreatureType {
