@@ -26,13 +26,12 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg) override;
 	
 		
-		char moveDirection;
-		int DEFAULT_SPEED = 5;
+	
+	char moveDirection;
+	int DEFAULT_SPEED = 3;  // Lowered from 5 so power-up boost is more noticeable
 
 
-		AwaitFrames acuariumUpdate{5};
-
-		ofTrueTypeFont gameOverTitle;
+	AwaitFrames acuariumUpdate{5};		ofTrueTypeFont gameOverTitle;
 		GameEvent lastEvent;
 
 
@@ -43,4 +42,5 @@ class ofApp : public ofBaseApp{
 	
 	ofSoundPlayer backgroundMusic;
 	ofSoundPlayer biteSound;
+	ofSoundPlayer powerUpSound;
 };

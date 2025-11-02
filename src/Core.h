@@ -36,19 +36,23 @@ public:
     }
 
     void draw(float x, float y) const {
+        ofSetColor(m_tintColor);
         if (m_flipped) {
             m_flippedImage.draw(x, y);
         } else {
             m_image.draw(x, y);
         }
+        ofSetColor(255); // Reset to white
     }
 
     void setFlipped(bool flipped) { m_flipped = flipped; }
+    void setTintColor(const ofColor& color) { m_tintColor = color; }
 
 private:
     ofImage m_image;
     ofImage m_flippedImage;
     bool m_flipped = false;
+    ofColor m_tintColor = ofColor::white;
 };
 
 
@@ -98,6 +102,7 @@ public:
     }
     void setSprite(std::shared_ptr<GameSprite> sprite) { m_sprite = std::move(sprite); }
     int getValue() const { return m_value; }
+    void setValue(int value) { m_value = value; }
 
     void setBounds(int w, int h);
     void moveBy(float dx, float dy);
@@ -111,6 +116,7 @@ enum class GameEventType {
     COLLISION,
     CREATURE_ADDED,
     CREATURE_REMOVED,
+    POWER_UP_COLLECTED,
     GAME_OVER,
     GAME_EXIT,
     NEW_LEVEL,
@@ -132,6 +138,7 @@ class GameEvent {
     bool isCollisionEvent() const { return type == GameEventType::COLLISION; }
     bool isCreatureAddedEvent() const { return type == GameEventType::CREATURE_ADDED; }
     bool isCreatureRemovedEvent() const { return type == GameEventType::CREATURE_REMOVED; }
+    bool isPowerUpCollected() const { return type == GameEventType::POWER_UP_COLLECTED; }
     bool isGameOver() const { return type == GameEventType::GAME_OVER; }
     bool isGameExit() const { return type == GameEventType::GAME_EXIT; }
     bool isNoneEvent() const { return type == GameEventType::NONE; }

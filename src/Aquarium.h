@@ -9,7 +9,8 @@
 
 enum class AquariumCreatureType {
     NPCreature,
-    BiggerFish
+    BiggerFish,
+    PowerUp
 };
 
 string AquariumCreatureTypeToString(AquariumCreatureType t);
@@ -67,12 +68,14 @@ public:
     void loseLife(int debounce);
     void increasePower(int value) { m_power += value; }
     void reduceDamageDebounce();
+    void setSpeedMultiplier(float mult) { m_speedMultiplier = mult; }
     
 private:
     int m_score = 0;
     int m_lives = 3;
     int m_power = 1; // mark current power lvl
     int m_damage_debounce = 0; // frames to wait after eating
+    float m_speedMultiplier = 1.0f;
 };
 
 class NPCreature : public Creature {
@@ -102,6 +105,7 @@ class AquariumSpriteManager {
     private:
         std::shared_ptr<GameSprite> m_npc_fish;
         std::shared_ptr<GameSprite> m_big_fish;
+        std::shared_ptr<GameSprite> m_power_up;
 };
 
 
@@ -123,6 +127,10 @@ public:
     int getCreatureCount() const { return m_creatures.size(); }
     int getWidth() const { return m_width; }
     int getHeight() const { return m_height; }
+    
+    float getSpeedMultiplier() const { return m_speedMultiplier; }
+    void setSpeedMultiplier(float mult) { m_speedMultiplier = mult; }
+    void setPowerUpActiveTimer(int frames) { m_powerUpActiveTimer = frames; }
 
 
 private:
@@ -130,6 +138,9 @@ private:
     int m_width;
     int m_height;
     int currentLevel = 0;
+    int m_powerUpTimer = 0;
+    int m_powerUpActiveTimer = 0;
+    float m_speedMultiplier = 1.0f;
     std::vector<std::shared_ptr<Creature>> m_creatures;
     std::vector<std::shared_ptr<Creature>> m_next_creatures;
     std::vector<std::shared_ptr<AquariumLevel>> m_aquariumlevels;

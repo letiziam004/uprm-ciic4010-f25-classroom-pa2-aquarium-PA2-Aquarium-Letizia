@@ -65,6 +65,11 @@ void ofApp::setup(){
     biteSound.load("Sounds/Minecraft-Eating.wav");
     biteSound.setMultiPlay(true); // Allow overlapping sounds
     biteSound.setVolume(0.8f);
+    
+    // Load power-up sound
+    powerUpSound.load("Sounds/Power-up.mp3");
+    powerUpSound.setMultiPlay(false);
+    powerUpSound.setVolume(0.7f);
 }
 
 //--------------------------------------------------------------
@@ -81,11 +86,17 @@ void ofApp::update(){
             return;
         }
         
-        
+        // 🎵 Play bite sound when fish is eaten
         if(gameScene->GetLastEvent() != nullptr && gameScene->GetLastEvent()->isCreatureRemovedEvent()){
-            ofLogNotice() << "Fish eaten!...";
+            ofLogNotice() << "🦷 Fish eaten! Playing bite sound...";
             biteSound.play();
-            
+            gameScene->SetLastEvent(std::make_shared<GameEvent>()); 
+        }
+        
+        // ⚡ Play power-up sound when collected
+        if(gameScene->GetLastEvent() != nullptr && gameScene->GetLastEvent()->isPowerUpCollected()){
+            ofLogNotice() << "⚡ Power-Up collected! Playing power-up sound...";
+            powerUpSound.play();
             gameScene->SetLastEvent(std::make_shared<GameEvent>()); 
         }
     }
