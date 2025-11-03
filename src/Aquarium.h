@@ -102,8 +102,8 @@ class ZigZagFish : public NPCreature {
 public:
     ZigZagFish(float x, float y, int speed, std::shared_ptr<GameSprite> sprite)
         : NPCreature(x, y, speed, sprite), counter(0) {
-        m_dx = 1; 
-        m_dy = 1;
+        m_dx = (rand() % 2 == 0) ? 1 : -1;  // Random horizontal direction
+        m_dy = (rand() % 2 == 0) ? 1 : -1;  // Random vertical direction
         Creature::setValue(1);
         m_creatureType = AquariumCreatureType::ZigZagFish;
     }
@@ -139,7 +139,7 @@ class LurkerFish : public NPCreature {
 public:
     LurkerFish(float x, float y, int speed, std::shared_ptr<GameSprite> sprite)
         : NPCreature(x, y, speed, sprite), darting(false), dartTimer(0), growthTimer(0), growthCounter(0), currentSize(60) {
-        m_dx = 1;
+        m_dx = (rand() % 2 == 0) ? 1 : -1;  // Random horizontal direction
         m_dy = 0;
         Creature::setValue(2); 
         m_creatureType = AquariumCreatureType::LurkerFish; 
@@ -315,6 +315,4 @@ class Level_2 : public AquariumLevel  {
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::ZigZagFish, 3));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::LurkerFish, 3));
         };
-        std::vector<AquariumCreatureType> Repopulate() override;
-
-};
+        std:

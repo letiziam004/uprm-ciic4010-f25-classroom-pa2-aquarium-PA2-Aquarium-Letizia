@@ -264,7 +264,7 @@ std::shared_ptr<Creature> Aquarium::getCreatureAt(int index) {
 void Aquarium::SpawnCreature(AquariumCreatureType type) {
     int x = rand() % this->getWidth();
     int y = rand() % this->getHeight();
-    int speed = 1 + rand() % 25; // Speed between 1 and 25
+    int speed = 1 + rand() % 3; // Speed between 1 and 3 (slower)
 
     switch (type) {
         case AquariumCreatureType::NPCreature:

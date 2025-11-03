@@ -29,7 +29,7 @@ class ofApp : public ofBaseApp{
 	
 	char moveDirection;
 	int DEFAULT_SPEED = 3;  // Lowered from 5 so power-up boost is more noticeable
-
+	ofVec2f backgroundOffset = ofVec2f(0, 0);
 
 	AwaitFrames acuariumUpdate{5};		ofTrueTypeFont gameOverTitle;
 		GameEvent lastEvent;
@@ -41,6 +41,4 @@ class ofApp : public ofBaseApp{
 	std::shared_ptr<AquariumSpriteManager>spriteManager;
 	
 	ofSoundPlayer backgroundMusic;
-	ofSoundPlayer biteSound;
-	ofSoundPlayer powerUpSound;
-};
+	ofSoundPlayer 

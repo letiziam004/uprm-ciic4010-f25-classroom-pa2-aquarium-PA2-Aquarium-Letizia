@@ -86,14 +86,13 @@ void ofApp::update(){
             return;
         }
         
-        // 🎵 Play bite sound when fish is eaten
+        // Play bite sound when fish is eaten
         if(gameScene->GetLastEvent() != nullptr && gameScene->GetLastEvent()->isCreatureRemovedEvent()){
             ofLogNotice() << "🦷 Fish eaten! Playing bite sound...";
             biteSound.play();
             gameScene->SetLastEvent(std::make_shared<GameEvent>()); 
         }
-        
-        // ⚡ Play power-up sound when collected
+        // Play power-up sound 
         if(gameScene->GetLastEvent() != nullptr && gameScene->GetLastEvent()->isPowerUpCollected()){
             ofLogNotice() << "⚡ Power-Up collected! Playing power-up sound...";
             powerUpSound.play();
@@ -103,13 +102,46 @@ void ofApp::update(){
 
     gameManager->UpdateActiveScene();
     
+   // Background moves 
+    if(gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)){
+        backgroundOffset.x += 0.3f;
+        
+        
+        
+        if(ofGetFrameNum() % 60 == 0) {
+            ofLogNotice() << "Background offset: (" << backgroundOffset.x << ", " << backgroundOffset.y << ")";
+        }
+    }
 
 
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    backgroundImage.draw(0, 0);
+    
+    int bgWidth = backgroundImage.getWidth();
+    int bgHeight = backgroundImage.getHeight();
+    
+    
+    if(ofGetFrameNum() % 60 == 0) {
+        ofLogNotice() << "🖼️ BG Size: " << bgWidth << "x" << bgHeight << " | Offset: (" << backgroundOffset.x << ", " << backgroundOffset.y << ")";
+    }
+    
+    
+    float startX = fmod(backgroundOffset.x, bgWidth);
+    float startY = fmod(backgroundOffset.y, bgHeight);
+    
+    
+    if (startX > 0) startX -= bgWidth;
+    if (startY > 0) startY -= bgHeight;
+    
+    
+    for (int x = startX; x <= ofGetWidth(); x += bgWidth) {
+        for (int y = startY; y <= ofGetHeight(); y += bgHeight) {
+            backgroundImage.draw(x, y);
+        }
+    }
+    
     gameManager->DrawActiveScene();
 }
 
