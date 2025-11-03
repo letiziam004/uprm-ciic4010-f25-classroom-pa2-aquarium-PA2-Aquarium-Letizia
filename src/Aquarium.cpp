@@ -11,6 +11,10 @@ string AquariumCreatureTypeToString(AquariumCreatureType t){
             return "BaseFish";
         case AquariumCreatureType::PowerUp:
             return "PowerUp";
+        case AquariumCreatureType::ZigZagFish:
+            return "ZigZagFish";
+        case AquariumCreatureType::LurkerFish:
+            return "LurkerFish";
         default:
             return "UknownFish";
     }
@@ -151,6 +155,9 @@ AquariumSpriteManager::AquariumSpriteManager(){
     this->m_big_fish = std::make_shared<GameSprite>("bigger-fish.png", 120, 120);
     this->m_power_up = std::make_shared<GameSprite>("base-fish.png", 50, 50);
     this->m_power_up->setTintColor(ofColor::yellow);
+    this->m_zigzag_fish = std::make_shared<GameSprite>("zigzag-fish.png", 60, 60);
+    this->m_lurker_fish = std::make_shared<GameSprite>("lurker-fish.png", 60, 60);
+    
 }
 
 std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureType t){
@@ -163,6 +170,12 @@ std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureTyp
             
         case AquariumCreatureType::PowerUp:
             return std::make_shared<GameSprite>(*this->m_power_up);
+            
+        case AquariumCreatureType::ZigZagFish:
+            return std::make_shared<GameSprite>(*this->m_zigzag_fish);
+            
+        case AquariumCreatureType::LurkerFish:
+            return std::make_shared<GameSprite>(*this->m_lurker_fish);
             
         default:
             return nullptr;
@@ -259,6 +272,12 @@ void Aquarium::SpawnCreature(AquariumCreatureType type) {
             break;
         case AquariumCreatureType::BiggerFish:
             this->addCreature(std::make_shared<BiggerFish>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::BiggerFish)));
+            break;
+        case AquariumCreatureType::ZigZagFish:
+            this->addCreature(std::make_shared<ZigZagFish>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::ZigZagFish)));
+            break;
+        case AquariumCreatureType::LurkerFish:
+            this->addCreature(std::make_shared<LurkerFish>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::LurkerFish)));
             break;
         case AquariumCreatureType::PowerUp: {
             
@@ -366,6 +385,8 @@ void AquariumGameScene::Update(){
 
         const float pushWeak = 8.0f;  // rebote cuando eres débil
         const float pushEat  = 4.0f;  // empujón suave al comer
+
+        ofLogNotice() << "🐟 Collision! Player power: " << m_player->getPower() << " vs Fish value: " << B->getValue();
 
         //  balance: solo come si es estrictamente mayor
         if (m_player->getPower() < B->getValue()) {

@@ -10,7 +10,9 @@
 enum class AquariumCreatureType {
     NPCreature,
     BiggerFish,
-    PowerUp
+    PowerUp,
+    ZigZagFish,
+    LurkerFish
 };
 
 string AquariumCreatureTypeToString(AquariumCreatureType t);
@@ -96,6 +98,117 @@ public:
     void draw() const override;
 };
 
+class ZigZagFish : public NPCreature {
+public:
+    ZigZagFish(float x, float y, int speed, std::shared_ptr<GameSprite> sprite)
+        : NPCreature(x, y, speed, sprite), counter(0) {
+        m_dx = 1; 
+        m_dy = 1;
+        Creature::setValue(1);
+        m_creatureType = AquariumCreatureType::ZigZagFish;
+    }
+
+    void move() override {
+        counter++;
+        if (counter % 30 == 0) { // Faster zigzag - every 0.5 seconds
+            m_dy = -m_dy; // zigzag pattern
+        }
+        Creature::normalize();
+        m_x += m_dx * m_speed;
+        m_y += m_dy * m_speed;
+        if(m_dx < 0) {
+            this->m_sprite->setFlipped(true);
+        } else {
+            this->m_sprite->setFlipped(false);
+        }
+        Creature::bounce();
+    }
+    
+    void draw() const override {
+        ofSetColor(ofColor::white);
+        if (m_sprite) {
+            m_sprite->draw(m_x, m_y);
+        }
+    }
+
+private:
+    int counter;
+};
+
+class LurkerFish : public NPCreature {
+public:
+    LurkerFish(float x, float y, int speed, std::shared_ptr<GameSprite> sprite)
+        : NPCreature(x, y, speed, sprite), darting(false), dartTimer(0), growthTimer(0), growthCounter(0), currentSize(60) {
+        m_dx = 1;
+        m_dy = 0;
+        Creature::setValue(2); 
+        m_creatureType = AquariumCreatureType::LurkerFish; 
+    }
+
+    void move() override {
+        dartTimer++;
+        growthTimer++;
+        
+        growthCounter++;
+        if (growthCounter % 300 == 0) { // every 5 seconds at 60fps
+            m_collisionRadius += 2.0f;
+            currentSize += 10; // Also increase visual size
+            ofLogNotice() << " LurkerFish growing! Size: " << currentSize << " Radius: " << m_collisionRadius;
+        }
+        
+        // Grow visual size slowly over time
+        if (growthTimer % 120 == 0 && currentSize < 120) {
+            currentSize += 5;
+        }
+        
+        if (!darting && dartTimer > 180 && ofRandom(1.0) < 0.05f) {
+            darting = true;
+            dartTimer = 0;
+            m_dy = -3;
+        }
+        if (darting) {
+            m_x += m_dx * m_speed;
+            m_y += m_dy;
+            m_dy += 0.2f;
+            if (m_dy > 2) {
+                m_dy = 0;
+                darting = false;
+            }
+        } else {
+            m_x += m_dx * m_speed;
+        }
+        if(m_dx < 0) {
+            this->m_sprite->setFlipped(true);
+        } else {
+            this->m_sprite->setFlipped(false);
+        }
+        Creature::bounce();
+    }
+    
+    void draw() const override {
+        ofLogNotice() << "🐟 Drawing LurkerFish at (" << m_x << ", " << m_y << ") size: " << currentSize;
+        ofSetColor(ofColor::white);
+        if (m_sprite) {
+            // Draw with dynamic size
+            ofPushMatrix();
+            ofTranslate(m_x, m_y);
+            float scale = currentSize / 60.0f;
+            ofScale(scale, scale);
+            m_sprite->draw(0, 0);
+            ofPopMatrix();
+        } else {
+            ofLogError() << "LurkerFish sprite is NULL!";
+        }
+    }
+
+private:
+    bool darting;
+    int dartTimer;
+    int growthTimer;
+    int growthCounter;
+    float currentSize;
+};
+
 
 class AquariumSpriteManager {
     public:
@@ -106,6 +219,8 @@ class AquariumSpriteManager {
         std::shared_ptr<GameSprite> m_npc_fish;
         std::shared_ptr<GameSprite> m_big_fish;
         std::shared_ptr<GameSprite> m_power_up;
+        std::shared_ptr<GameSprite> m_zigzag_fish;
+        std::shared_ptr<GameSprite> m_lurker_fish;
 };
 
 
@@ -176,7 +291,7 @@ class Level_0 : public AquariumLevel  {
     public:
         Level_0(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 10));
-
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::ZigZagFish, 3));
         };
         std::vector<AquariumCreatureType> Repopulate() override;
 
@@ -184,8 +299,9 @@ class Level_0 : public AquariumLevel  {
 class Level_1 : public AquariumLevel  {
     public:
         Level_1(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
-            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 20));
-
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 15));
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::ZigZagFish, 5));
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::LurkerFish, 2));
         };
         std::vector<AquariumCreatureType> Repopulate() override;
 
@@ -194,9 +310,10 @@ class Level_1 : public AquariumLevel  {
 class Level_2 : public AquariumLevel  {
     public:
         Level_2(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
-            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 30));
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 20));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::BiggerFish, 5));
-
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::ZigZagFish, 3));
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::LurkerFish, 3));
         };
         std::vector<AquariumCreatureType> Repopulate() override;
 
