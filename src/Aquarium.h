@@ -71,6 +71,7 @@ public:
     void increasePower(int value) { m_power += value; }
     void reduceDamageDebounce();
     void setSpeedMultiplier(float mult) { m_speedMultiplier = mult; }
+    void setTintColor(const ofColor& color) { m_tintColor = color; }
     
 private:
     int m_score = 0;
@@ -78,6 +79,7 @@ private:
     int m_power = 1; // mark current power lvl
     int m_damage_debounce = 0; // frames to wait after eating
     float m_speedMultiplier = 1.0f;
+    ofColor m_tintColor = ofColor::white;
 };
 
 class NPCreature : public Creature {

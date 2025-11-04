@@ -36,13 +36,18 @@ public:
     }
 
     void draw(float x, float y) const {
-        ofSetColor(m_tintColor);
+        // Apply the sprite tint color 
+        ofColor currentColor = ofGetStyle().color;
+        ofSetColor(currentColor.r * m_tintColor.r / 255.0f,
+                   currentColor.g * m_tintColor.g / 255.0f,
+                   currentColor.b * m_tintColor.b / 255.0f,
+                   currentColor.a * m_tintColor.a / 255.0f);
+        
         if (m_flipped) {
             m_flippedImage.draw(x, y);
         } else {
             m_image.draw(x, y);
         }
-        ofSetColor(255); // Reset to white
     }
 
     void setFlipped(bool flipped) { m_flipped = flipped; }

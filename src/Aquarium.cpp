@@ -50,16 +50,25 @@ void PlayerCreature::update() {
 
 
 void PlayerCreature::draw() const {
-    
     ofLogVerbose() << "PlayerCreature at (" << m_x << ", " << m_y << ") with speed " << m_speed << std::endl;
-    if (this->m_damage_debounce > 0) {
-        ofSetColor(ofColor::red); // Flash red if in damage debounce
-    }
-    if (m_sprite) {
-        m_sprite->draw(m_x, m_y);
-    }
-    ofSetColor(ofColor::white); // Reset color
 
+    // Scale based on power level 
+
+    if (this->m_damage_debounce > 0) {
+        ofSetColor(ofColor::red); // Flash red if hit
+    } else {
+        ofSetColor(m_tintColor); // Use tint color (set on level-up)
+    }
+
+    if (m_sprite) {
+        ofPushMatrix();
+        ofTranslate(m_x, m_y);
+        ofScale(scale, scale);
+        m_sprite->draw(0, 0); 
+        ofPopMatrix();
+    }
+
+    ofSetColor(ofColor::white); // Reset color
 }
 
 void PlayerCreature::changeSpeed(int speed) {
@@ -367,6 +376,23 @@ void AquariumGameScene::Update(){
         m_lastEvent = std::make_shared<GameEvent>(GameEventType::NEW_LEVEL, m_player, nullptr);
         m_aquarium->clearLevelUpFlag();
 
+        // Increase player power on level-up
+        m_player->increasePower(1);
+        
+        // Update player tint color and size based on new power level
+        int power = m_player->getPower();
+        switch(power) {
+            case 1: m_player->setTintColor(ofColor::white); break;
+            case 2: m_player->setTintColor(ofColor::green); break;
+            case 3: m_player->setTintColor(ofColor::cyan); break;
+            case 4: m_player->setTintColor(ofColor::yellow); break;
+            case 5: m_player->setTintColor(ofColor::orange); break;
+            case 6: m_player->setTintColor(ofColor::red); break;
+            default: m_player->setTintColor(ofColor::purple); break;
+        }
+        
+        ofLogNotice() << " Player leveled up! Power: " << power << " Size: " << (1.0f + power * 0.05f) << "x";
+
         // Plays level-Up sound
         if (m_levelUpSound != nullptr) {
             ofLogNotice() << " LEVEL UP! Playing level-up sound...";
@@ -434,7 +460,7 @@ void AquariumGameScene::Update(){
                 return;
             }
         } else {
-            ofLogNotice() << " Player STRONGER or EQUAL - Eating fish!";
+            ofLogNotice() << "Player STRONGER or EQUAL - Eating fish!";
             // come → empujón solo al player, luego remove
             A->moveBy(nx * pushEat, ny * pushEat);
             A->bounce();
@@ -443,8 +469,6 @@ void AquariumGameScene::Update(){
             m_player->addToScore(1, B->getValue());
 
             m_lastEvent = std::make_shared<GameEvent>(GameEventType::CREATURE_REMOVED, m_player, B);
-
-            // Power stays at 1 - player can only eat base fish
         }
     }
 }
