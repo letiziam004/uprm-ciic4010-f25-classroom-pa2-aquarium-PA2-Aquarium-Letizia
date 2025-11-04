@@ -309,7 +309,7 @@ void Aquarium::Repopulate() {
     ofLogVerbose("entering phase repopulation");
     // Loop back to level 1 after completing all levels
     int selectedLevelIdx = this->currentLevel % this->m_aquariumlevels.size();
-    ofLogNotice() << "📊 Current level index: " << selectedLevelIdx << " (Level " << (selectedLevelIdx + 1) << ")" << endl;
+    ofLogNotice() << "Current level index: " << selectedLevelIdx << " (Level " << (selectedLevelIdx + 1) << ")" << endl;
     std::shared_ptr<AquariumLevel> level = this->m_aquariumlevels.at(selectedLevelIdx);
 
 
@@ -318,9 +318,12 @@ void Aquarium::Repopulate() {
         this->currentLevel += 1;
         // Loop back to the beginning
         selectedLevelIdx = this->currentLevel % this->m_aquariumlevels.size();
-        ofLogNotice()<<"🎉 LEVEL UP! New level reached: " << selectedLevelIdx << " (Level " << (selectedLevelIdx + 1) << ")" << std::endl;
+        ofLogNotice() << " LEVEL UP! New level reached: " << selectedLevelIdx << " (Level " << (selectedLevelIdx + 1) << ")" << std::endl;
         level = this->m_aquariumlevels.at(selectedLevelIdx);
         this->clearCreatures();
+
+        // Level-Up signal
+        m_justLeveledUp = true;
     }
 
     
@@ -357,6 +360,19 @@ void AquariumGameScene::Update(){
 
     // 2) mover NPCs / repoblar / niveles
     m_aquarium->update();
+    
+    
+    if (m_aquarium->hasJustLeveledUp()) {
+        m_levelUpTimer = 180; // spawn message for 3s
+        m_lastEvent = std::make_shared<GameEvent>(GameEventType::NEW_LEVEL, m_player, nullptr);
+        m_aquarium->clearLevelUpFlag();
+
+        // Plays level-Up sound
+        if (m_levelUpSound != nullptr) {
+            ofLogNotice() << " LEVEL UP! Playing level-up sound...";
+            m_levelUpSound->play();
+        }
+    }
 
     // 3) detectar colisiones
     auto event = DetectAquariumCollisions(m_aquarium, m_player);
@@ -392,7 +408,7 @@ void AquariumGameScene::Update(){
 
         //  balance: solo come si es estrictamente mayor
         if (m_player->getPower() < B->getValue()) {
-            ofLogNotice() << "❌ Player WEAKER - Losing life!";
+            ofLogNotice() << " Player WEAKER - Losing life!";
             // Strong bounce to prevent passing through enemy fish
             A->moveBy( nx * pushWeak,  ny * pushWeak);
             B->moveBy(-nx * pushWeak, -ny * pushWeak);
@@ -403,10 +419,10 @@ void AquariumGameScene::Update(){
             
             // Play hit sound directly
             if (m_hitSound != nullptr) {
-                ofLogNotice() << "🔊 Playing hit sound directly!";
+                ofLogNotice() << " Playing hit sound directly!";
                 m_hitSound->play();
             } else {
-                ofLogWarning() << "⚠️ Hit sound not available!";
+                ofLogWarning() << " Hit sound not available!";
             }
             
             // Also emit event for tracking
@@ -418,7 +434,7 @@ void AquariumGameScene::Update(){
                 return;
             }
         } else {
-            ofLogNotice() << "✅ Player STRONGER or EQUAL - Eating fish!";
+            ofLogNotice() << " Player STRONGER or EQUAL - Eating fish!";
             // come → empujón solo al player, luego remove
             A->moveBy(nx * pushEat, ny * pushEat);
             A->bounce();
@@ -437,6 +453,29 @@ void AquariumGameScene::Draw() {
     this->m_player->draw();
     this->m_aquarium->draw();
     this->paintAquariumHUD();
+    
+    // Draw LEVEL UP image
+    if (m_levelUpTimer > 0) {
+        if (m_levelUpImage.isAllocated()) {
+           
+            ofPushStyle();
+            ofSetColor(255, 255, 255, 255); 
+            
+            //size of image 
+            float scale = 0.5f;
+            float imgWidth = m_levelUpImage.getWidth() * scale;
+            float imgHeight = m_levelUpImage.getHeight() * scale;
+            float x = (ofGetWidth() - imgWidth) / 2;
+            float y = (ofGetHeight() - imgHeight) / 2;
+            
+            ofEnableAlphaBlending();
+            m_levelUpImage.draw(x, y, imgWidth, imgHeight);
+            ofDisableAlphaBlending();
+            
+            ofPopStyle();
+        }
+        m_levelUpTimer--;
+    }
 
 }
 

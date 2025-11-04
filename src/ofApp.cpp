@@ -52,12 +52,28 @@ void ofApp::setup(){
     hitSound.setMultiPlay(true); // Allow overlapping hit sounds
     hitSound.setVolume(1.0f); // Max volume to make sure it's audible
     if(hitSound.isLoaded()){
-        ofLogNotice() << "✅ Hit sound loaded successfully!";
+        ofLogNotice() << " Hit sound loaded successfully!";
         aquariumScene->SetHitSound(&hitSound);
-        ofLogNotice() << "✅ Hit sound passed to aquarium scene!";
+        ofLogNotice() << " Hit sound passed to aquarium scene!";
     } else {
-        ofLogError() << "❌ Failed to load hit sound!";
+        ofLogError() << " Failed to load hit sound!";
     }
+    
+    // Load level-up sound BEFORE setting it on the scene
+    levelUpSound.load("Sounds/level-up.mp3");
+    levelUpSound.setMultiPlay(false);
+    levelUpSound.setVolume(0.9f);
+    if(levelUpSound.isLoaded()){
+        ofLogNotice() << " Level-up sound loaded successfully!";
+        aquariumScene->SetLevelUpSound(&levelUpSound);
+        ofLogNotice() << "Level-up sound passed to aquarium scene!";
+    } else {
+        ofLogError() << "Failed to load level-up sound!";
+    }
+    
+    // Preload level-up image to avoid stuttering on first level-up
+    aquariumScene->PreloadLevelUpImage();
+    ofLogNotice() << "✅ Level-up image preloaded!";
 
     // Load font for game over message
     gameOverTitle.load("Verdana.ttf", 12, true, true);

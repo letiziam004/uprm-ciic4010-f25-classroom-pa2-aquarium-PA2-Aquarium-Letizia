@@ -248,6 +248,9 @@ public:
     float getSpeedMultiplier() const { return m_speedMultiplier; }
     void setSpeedMultiplier(float mult) { m_speedMultiplier = mult; }
     void setPowerUpActiveTimer(int frames) { m_powerUpActiveTimer = frames; }
+    
+    bool hasJustLeveledUp() const { return m_justLeveledUp; }
+    void clearLevelUpFlag() { m_justLeveledUp = false; }
 
 
 private:
@@ -258,6 +261,7 @@ private:
     int m_powerUpTimer = 0;
     int m_powerUpActiveTimer = 0;
     float m_speedMultiplier = 1.0f;
+    bool m_justLeveledUp = false;
     std::vector<std::shared_ptr<Creature>> m_creatures;
     std::vector<std::shared_ptr<Creature>> m_next_creatures;
     std::vector<std::shared_ptr<AquariumLevel>> m_aquariumlevels;
@@ -280,6 +284,12 @@ class AquariumGameScene : public GameScene {
         void Update() override;
         void Draw() override;
         void SetHitSound(ofSoundPlayer* sound) { m_hitSound = sound; }
+        void SetLevelUpSound(ofSoundPlayer* sound) { m_levelUpSound = sound; }
+        void PreloadLevelUpImage() { 
+            if (!m_levelUpImage.isAllocated()) {
+                m_levelUpImage.load("LevelUp!.png"); 
+            }
+        }
     private:
         void paintAquariumHUD();
         std::shared_ptr<PlayerCreature> m_player;
@@ -288,6 +298,9 @@ class AquariumGameScene : public GameScene {
         string m_name;
         AwaitFrames updateControl{5};
         ofSoundPlayer* m_hitSound = nullptr;
+        ofSoundPlayer* m_levelUpSound = nullptr;
+        int m_levelUpTimer = 0; 
+        ofImage m_levelUpImage;
 };
 
 

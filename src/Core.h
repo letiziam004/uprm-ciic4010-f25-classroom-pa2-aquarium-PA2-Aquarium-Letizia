@@ -144,6 +144,7 @@ class GameEvent {
     bool isGameOver() const { return type == GameEventType::GAME_OVER; }
     bool isGameExit() const { return type == GameEventType::GAME_EXIT; }
     bool isNoneEvent() const { return type == GameEventType::NONE; }
+    bool isNewLevelEvent() const { return type == GameEventType::NEW_LEVEL; }
     
     // i want a printable representation of the event, with the creature descriptions if available
     void print() const;
