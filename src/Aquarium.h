@@ -242,6 +242,8 @@ public:
     int getCreatureCount() const { return m_creatures.size(); }
     int getWidth() const { return m_width; }
     int getHeight() const { return m_height; }
+    int getCurrentLevel() const { return currentLevel; }
+    int getLevelCount() const { return m_aquariumlevels.size(); }
     
     float getSpeedMultiplier() const { return m_speedMultiplier; }
     void setSpeedMultiplier(float mult) { m_speedMultiplier = mult; }
@@ -316,4 +318,70 @@ class Level_2 : public AquariumLevel  {
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::LurkerFish, 3));
         };
         std::vector<AquariumCreatureType> Repopulate() override;
+};
+
+class Level_3 : public AquariumLevel  {
+public:
+    Level_3(int levelNumber, int targetScore)
+    : AquariumLevel(levelNumber, targetScore) {
+        m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 20));
+        m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::ZigZagFish, 5));
+        m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::LurkerFish, 4));
+    }
+
+    std::vector<AquariumCreatureType> Repopulate() override {
+        std::vector<AquariumCreatureType> toRepopulate;
+        for (auto& node : m_levelPopulation) {
+            int delta = node->population - node->currentPopulation;
+            if (delta > 0) {
+                toRepopulate.insert(toRepopulate.end(), delta, node->creatureType);
+                node->currentPopulation += delta;
+            }
+        }
+        return toRepopulate;
+    }
+};
+
+class Level_4 : public AquariumLevel  {
+public:
+    Level_4(int levelNumber, int targetScore)
+    : AquariumLevel(levelNumber, targetScore) {
+        m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 15));
+        m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::ZigZagFish, 7));
+        m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::BiggerFish, 6));
+    }
+
+    std::vector<AquariumCreatureType> Repopulate() override {
+        std::vector<AquariumCreatureType> toRepopulate;
+        for (auto& node : m_levelPopulation) {
+            int delta = node->population - node->currentPopulation;
+            if (delta > 0) {
+                toRepopulate.insert(toRepopulate.end(), delta, node->creatureType);
+                node->currentPopulation += delta;
+            }
+        }
+        return toRepopulate;
+    }
+};
+
+class Level_5 : public AquariumLevel  {
+public:
+    Level_5(int levelNumber, int targetScore)
+    : AquariumLevel(levelNumber, targetScore) {
+        m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 10));
+        m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::BiggerFish, 7));
+        m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::LurkerFish, 5));
+    }
+
+    std::vector<AquariumCreatureType> Repopulate() override {
+        std::vector<AquariumCreatureType> toRepopulate;
+        for (auto& node : m_levelPopulation) {
+            int delta = node->population - node->currentPopulation;
+            if (delta > 0) {
+                toRepopulate.insert(toRepopulate.end(), delta, node->creatureType);
+                node->currentPopulation += delta;
+            }
+        }
+        return toRepopulate;
+    }
 };

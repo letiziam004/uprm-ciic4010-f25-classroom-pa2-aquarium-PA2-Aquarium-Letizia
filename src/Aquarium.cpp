@@ -307,17 +307,18 @@ void Aquarium::SpawnCreature(AquariumCreatureType type) {
 // which will mean incrementing the buffer and pointing to a new lvl index
 void Aquarium::Repopulate() {
     ofLogVerbose("entering phase repopulation");
-    // lets make the levels circular
+    // Loop back to level 1 after completing all levels
     int selectedLevelIdx = this->currentLevel % this->m_aquariumlevels.size();
-    ofLogVerbose() << "the current index: " << selectedLevelIdx << endl;
+    ofLogNotice() << "📊 Current level index: " << selectedLevelIdx << " (Level " << (selectedLevelIdx + 1) << ")" << endl;
     std::shared_ptr<AquariumLevel> level = this->m_aquariumlevels.at(selectedLevelIdx);
 
 
     if(level->isCompleted()){
         level->levelReset();
         this->currentLevel += 1;
+        // Loop back to the beginning
         selectedLevelIdx = this->currentLevel % this->m_aquariumlevels.size();
-        ofLogNotice()<<"new level reached : " << selectedLevelIdx << std::endl;
+        ofLogNotice()<<"🎉 LEVEL UP! New level reached: " << selectedLevelIdx << " (Level " << (selectedLevelIdx + 1) << ")" << std::endl;
         level = this->m_aquariumlevels.at(selectedLevelIdx);
         this->clearCreatures();
     }
@@ -428,6 +429,8 @@ void AquariumGameScene::Draw() {
 
 void AquariumGameScene::paintAquariumHUD(){
     float panelWidth = ofGetWindowWidth() - 150;
+    int currentLevelIndex = m_aquarium->getCurrentLevel() % m_aquarium->getLevelCount();
+    ofDrawBitmapString("Level: " + std::to_string(currentLevelIndex + 1), panelWidth, 10);
     ofDrawBitmapString("Score: " + std::to_string(this->m_player->getScore()), panelWidth, 20);
     ofDrawBitmapString("Power: " + std::to_string(this->m_player->getPower()), panelWidth, 30);
     ofDrawBitmapString("Lives: " + std::to_string(this->m_player->getLives()), panelWidth, 40);
