@@ -155,8 +155,8 @@ AquariumSpriteManager::AquariumSpriteManager(){
     this->m_big_fish = std::make_shared<GameSprite>("bigger-fish.png", 120, 120);
     this->m_power_up = std::make_shared<GameSprite>("base-fish.png", 50, 50);
     this->m_power_up->setTintColor(ofColor::yellow);
-    this->m_zigzag_fish = std::make_shared<GameSprite>("zigzag-fish.png", 60, 60);
-    this->m_lurker_fish = std::make_shared<GameSprite>("lurker-fish.png", 60, 60);
+    this->m_zigzag_fish = std::make_shared<GameSprite>("zigzag-fish.png", 70, 70);
+    this->m_lurker_fish = std::make_shared<GameSprite>("lurker-fish.png", 70, 70);
     
 }
 
@@ -365,7 +365,7 @@ void AquariumGameScene::Update(){
 
         
         if (B->getValue() == -999) {
-            ofLogNotice() << "⚡ Player picked up Speed Power-Up!";
+            ofLogNotice() << " Player picked up Speed Power-Up!";
             
            
             m_player->setSpeedMultiplier(1.5f);
@@ -383,14 +383,15 @@ void AquariumGameScene::Update(){
         float len = std::sqrt(nx*nx + ny*ny);
         if (len > 0.0001f) { nx /= len; ny /= len; }
 
-        const float pushWeak = 8.0f;  // rebote cuando eres débil
+        const float pushWeak = 20.0f;  // Strong bounce when hitting enemy fish
         const float pushEat  = 4.0f;  // empujón suave al comer
 
-        ofLogNotice() << "🐟 Collision! Player power: " << m_player->getPower() << " vs Fish value: " << B->getValue();
+        ofLogNotice() << "🐟 COLLISION! Player power: " << m_player->getPower() << " vs Fish value: " << B->getValue() << " (Type: " << AquariumCreatureTypeToString(std::static_pointer_cast<NPCreature>(B)->GetType()) << ")";
 
         //  balance: solo come si es estrictamente mayor
         if (m_player->getPower() < B->getValue()) {
-            // más débil → rebote en ambos + vida
+            ofLogNotice() << "❌ Player WEAKER - Losing life!";
+            // Strong bounce to prevent passing through enemy fish
             A->moveBy( nx * pushWeak,  ny * pushWeak);
             B->moveBy(-nx * pushWeak, -ny * pushWeak);
             A->bounce();
@@ -402,6 +403,7 @@ void AquariumGameScene::Update(){
                 return;
             }
         } else {
+            ofLogNotice() << "✅ Player STRONGER or EQUAL - Eating fish!";
             // come → empujón solo al player, luego remove
             A->moveBy(nx * pushEat, ny * pushEat);
             A->bounce();
@@ -411,11 +413,7 @@ void AquariumGameScene::Update(){
 
             m_lastEvent = std::make_shared<GameEvent>(GameEventType::CREATURE_REMOVED, m_player, B);
 
-            // subir poder más lento (opcional: 50 en vez de 25)
-            if (m_player->getScore() % 50 == 0) {
-                m_player->increasePower(1);
-                ofLogNotice() << "Player power increased to " << m_player->getPower() << "!";
-            }
+            // Power stays at 1 - player can only eat base fish
         }
     }
 }

@@ -41,4 +41,6 @@ class ofApp : public ofBaseApp{
 	std::shared_ptr<AquariumSpriteManager>spriteManager;
 	
 	ofSoundPlayer backgroundMusic;
-	ofSoundPlayer 
+	ofSoundPlayer biteSound;
+	ofSoundPlayer powerUpSound;
+}; 
