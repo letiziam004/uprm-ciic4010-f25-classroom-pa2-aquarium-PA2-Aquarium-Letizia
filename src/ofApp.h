@@ -43,4 +43,5 @@ class ofApp : public ofBaseApp{
 	ofSoundPlayer backgroundMusic;
 	ofSoundPlayer biteSound;
 	ofSoundPlayer powerUpSound;
+	ofSoundPlayer hitSound;
 }; 

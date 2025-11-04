@@ -361,6 +361,7 @@ void AquariumGameScene::Update(){
     // 3) detectar colisiones
     auto event = DetectAquariumCollisions(m_aquarium, m_player);
     if (event && event->isCollisionEvent() && event->creatureA && event->creatureB) {
+        ofLogNotice() << "⚡ COLLISION DETECTED! Hit sound ptr: " << (void*)m_hitSound;
         auto A = event->creatureA; // player
         auto B = event->creatureB; // npc
 
@@ -398,8 +399,21 @@ void AquariumGameScene::Update(){
             A->bounce();
             B->bounce();
 
-            m_player->loseLife(3 * 60);
+            m_player->loseLife(10); // Very short debounce - about 0.16 seconds
+            
+            // Play hit sound directly
+            if (m_hitSound != nullptr) {
+                ofLogNotice() << "🔊 Playing hit sound directly!";
+                m_hitSound->play();
+            } else {
+                ofLogWarning() << "⚠️ Hit sound not available!";
+            }
+            
+            // Also emit event for tracking
+            m_lastEvent = std::make_shared<GameEvent>(GameEventType::PLAYER_HIT, m_player, B);
+            
             if (m_player->getLives() <= 0) {
+                ofLogNotice() << "💀 Game Over - No lives left!";
                 m_lastEvent = std::make_shared<GameEvent>(GameEventType::GAME_OVER, m_player, nullptr);
                 return;
             }

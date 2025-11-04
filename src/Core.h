@@ -117,6 +117,7 @@ enum class GameEventType {
     CREATURE_ADDED,
     CREATURE_REMOVED,
     POWER_UP_COLLECTED,
+    PLAYER_HIT,
     GAME_OVER,
     GAME_EXIT,
     NEW_LEVEL,
@@ -139,6 +140,7 @@ class GameEvent {
     bool isCreatureAddedEvent() const { return type == GameEventType::CREATURE_ADDED; }
     bool isCreatureRemovedEvent() const { return type == GameEventType::CREATURE_REMOVED; }
     bool isPowerUpCollected() const { return type == GameEventType::POWER_UP_COLLECTED; }
+    bool isPlayerHit() const { return type == GameEventType::PLAYER_HIT; }
     bool isGameOver() const { return type == GameEventType::GAME_OVER; }
     bool isGameExit() const { return type == GameEventType::GAME_EXIT; }
     bool isNoneEvent() const { return type == GameEventType::NONE; }

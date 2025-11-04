@@ -42,9 +42,22 @@ void ofApp::setup(){
     myAquarium->Repopulate(); // initial population
 
     // now that we are mostly set, lets pass the player and the aquarium downstream
-    gameManager->AddScene(std::make_shared<AquariumGameScene>(
+    auto aquariumScene = std::make_shared<AquariumGameScene>(
         std::move(player), std::move(myAquarium), GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)
-    )); // player and aquarium are owned by the scene moving forward
+    );
+    gameManager->AddScene(aquariumScene); // player and aquarium are owned by the scene moving forward
+    
+    // Load hit sound BEFORE setting it on the scene
+    hitSound.load("Sounds/hit.mp3");
+    hitSound.setMultiPlay(true); // Allow overlapping hit sounds
+    hitSound.setVolume(1.0f); // Max volume to make sure it's audible
+    if(hitSound.isLoaded()){
+        ofLogNotice() << "✅ Hit sound loaded successfully!";
+        aquariumScene->SetHitSound(&hitSound);
+        ofLogNotice() << "✅ Hit sound passed to aquarium scene!";
+    } else {
+        ofLogError() << "❌ Failed to load hit sound!";
+    }
 
     // Load font for game over message
     gameOverTitle.load("Verdana.ttf", 12, true, true);
@@ -88,6 +101,18 @@ void ofApp::update(){
             gameManager->Transition(GameSceneKindToString(GameSceneKind::GAME_OVER));
             return;
         }
+    }
+
+    gameManager->UpdateActiveScene();
+    
+    // Check for sound events AFTER updating the scene
+    if(gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)){
+        auto gameScene = std::static_pointer_cast<AquariumGameScene>(gameManager->GetActiveScene());
+        
+        // Debug: Check what event we have
+        if(gameScene->GetLastEvent() != nullptr && !gameScene->GetLastEvent()->isNoneEvent()){
+            ofLogNotice() << "📢 Event detected in ofApp::update()";
+        }
         
         // Play bite sound when fish is eaten
         if(gameScene->GetLastEvent() != nullptr && gameScene->GetLastEvent()->isCreatureRemovedEvent()){
@@ -101,9 +126,13 @@ void ofApp::update(){
             powerUpSound.play();
             gameScene->SetLastEvent(std::make_shared<GameEvent>()); 
         }
+        // Play hit sound when player gets hit by enemy
+        if(gameScene->GetLastEvent() != nullptr && gameScene->GetLastEvent()->isPlayerHit()){
+            ofLogNotice() << "💥 Player hit by enemy! Playing hit sound...";
+            hitSound.play();
+            gameScene->SetLastEvent(std::make_shared<GameEvent>()); 
+        }
     }
-
-    gameManager->UpdateActiveScene();
     
    // Background moves 
     if(gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)){
