@@ -15,6 +15,14 @@ string AquariumCreatureTypeToString(AquariumCreatureType t){
             return "ZigZagFish";
         case AquariumCreatureType::LurkerFish:
             return "LurkerFish";
+        case AquariumCreatureType::BlueFish:
+            return "BlueFish";
+        case AquariumCreatureType::RedFish:
+            return "RedFish";
+        case AquariumCreatureType::VioletFish:
+            return "VioletFish";
+        case AquariumCreatureType::Shark:
+            return "Shark";
         default:
             return "UknownFish";
     }
@@ -53,6 +61,7 @@ void PlayerCreature::draw() const {
     ofLogVerbose() << "PlayerCreature at (" << m_x << ", " << m_y << ") with speed " << m_speed << std::endl;
 
     // Scale based on power level 
+    float scale = 1.0f + m_power * 0.05f; // 5% growth per power level
 
     if (this->m_damage_debounce > 0) {
         ofSetColor(ofColor::red); // Flash red if hit
@@ -135,7 +144,7 @@ BiggerFish::BiggerFish(float x, float y, int speed, std::shared_ptr<GameSprite> 
     normalize();
 
     setCollisionRadius(50); // Bigger fish have a larger collision radius
-    m_value = 5; // Bigger fish have a higher value
+    m_value = 7; // Bigger fish have a higher value (increased from 5)
     m_creatureType = AquariumCreatureType::BiggerFish;
 }
 
@@ -166,7 +175,10 @@ AquariumSpriteManager::AquariumSpriteManager(){
     this->m_power_up->setTintColor(ofColor::yellow);
     this->m_zigzag_fish = std::make_shared<GameSprite>("zigzag-fish.png", 70, 70);
     this->m_lurker_fish = std::make_shared<GameSprite>("lurker-fish.png", 70, 70);
-    
+    this->m_blue_fish = std::make_shared<GameSprite>("Blue-fish.png", 70, 70);
+    this->m_red_fish = std::make_shared<GameSprite>("Red-fish.png", 70, 70);
+    this->m_violet_fish = std::make_shared<GameSprite>("Violet-fish.png", 70, 70);
+    this->m_shark = std::make_shared<GameSprite>("shark.png", 180, 180); 
 }
 
 std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureType t){
@@ -185,6 +197,18 @@ std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureTyp
             
         case AquariumCreatureType::LurkerFish:
             return std::make_shared<GameSprite>(*this->m_lurker_fish);
+            
+        case AquariumCreatureType::BlueFish:
+            return std::make_shared<GameSprite>(*this->m_blue_fish);
+            
+        case AquariumCreatureType::RedFish:
+            return std::make_shared<GameSprite>(*this->m_red_fish);
+            
+        case AquariumCreatureType::VioletFish:
+            return std::make_shared<GameSprite>(*this->m_violet_fish);
+            
+        case AquariumCreatureType::Shark:
+            return std::make_shared<GameSprite>(*this->m_shark);
             
         default:
             return nullptr;
@@ -287,6 +311,34 @@ void Aquarium::SpawnCreature(AquariumCreatureType type) {
             break;
         case AquariumCreatureType::LurkerFish:
             this->addCreature(std::make_shared<LurkerFish>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::LurkerFish)));
+            break;
+        case AquariumCreatureType::BlueFish:
+            {
+                auto fish = std::make_shared<NPCreature>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::BlueFish));
+                fish->setValue(3); // Blue fish have value 3
+                this->addCreature(fish);
+            }
+            break;
+        case AquariumCreatureType::RedFish:
+            {
+                auto fish = std::make_shared<NPCreature>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::RedFish));
+                fish->setValue(4); // Red fish have value 4
+                this->addCreature(fish);
+            }
+            break;
+        case AquariumCreatureType::VioletFish:
+            {
+                auto fish = std::make_shared<NPCreature>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::VioletFish));
+                fish->setValue(5); // Violet fish have value 5
+                this->addCreature(fish);
+            }
+            break;
+        case AquariumCreatureType::Shark:
+            {
+                auto shark = std::make_shared<BiggerFish>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::Shark));
+                shark->setValue(8); // Sharks have highest value (8)
+                this->addCreature(shark);
+            }
             break;
         case AquariumCreatureType::PowerUp: {
             
