@@ -377,6 +377,14 @@ void Aquarium::Repopulate() {
     if(level->isCompleted()){
         level->levelReset();
         this->currentLevel += 1;
+        
+        // Check if all levels completed (6 levels: 0-5, so currentLevel == 6 means victory)
+        if (this->currentLevel >= this->m_aquariumlevels.size()) {
+            ofLogNotice() << "🎉 VICTORY! All levels completed!";
+            m_justLeveledUp = true; // Trigger victory display
+            return; // Don't repopulate, game is won
+        }
+        
         // Loop back to the beginning
         selectedLevelIdx = this->currentLevel % this->m_aquariumlevels.size();
         ofLogNotice() << " LEVEL UP! New level reached: " << selectedLevelIdx << " (Level " << (selectedLevelIdx + 1) << ")" << std::endl;
@@ -422,11 +430,28 @@ void AquariumGameScene::Update(){
     // 2) mover NPCs / repoblar / niveles
     m_aquarium->update();
     
+    // Decrement invincibility timer
+    if (m_invincibilityTimer > 0) {
+        m_invincibilityTimer--;
+    }
     
     if (m_aquarium->hasJustLeveledUp()) {
+        m_aquarium->clearLevelUpFlag();
+        
+        // Check if player has completed all levels (victory condition)
+        if (m_aquarium->getCurrentLevel() >= m_aquarium->getLevelCount()) {
+            m_victoryTimer = 300; // Show victory message for 5 seconds
+            m_hasWon = true;
+            ofLogNotice() << "🏆 VICTORY! You Won!";
+            return; // Stop normal gameplay
+        }
+        
+        // Reset invincibility timer for new level (5 seconds)
+        m_invincibilityTimer = 300;
+        ofLogNotice() << "🛡️ NEW LEVEL - 5 seconds of invincibility!";
+        
         m_levelUpTimer = 180; // spawn message for 3s
         m_lastEvent = std::make_shared<GameEvent>(GameEventType::NEW_LEVEL, m_player, nullptr);
-        m_aquarium->clearLevelUpFlag();
 
         // Increase player power on level-up
         m_player->increasePower(1);
@@ -486,6 +511,17 @@ void AquariumGameScene::Update(){
 
         //  balance: solo come si es estrictamente mayor
         if (m_player->getPower() < B->getValue()) {
+            // Check if player is invincible
+            if (m_invincibilityTimer > 0) {
+                ofLogNotice() << "🛡️ Player is INVINCIBLE! No damage taken. Time left: " << (m_invincibilityTimer / 60.0f) << "s";
+                // Still bounce off the fish, but no damage
+                A->moveBy( nx * pushWeak,  ny * pushWeak);
+                B->moveBy(-nx * pushWeak, -ny * pushWeak);
+                A->bounce();
+                B->bounce();
+                return; // Skip damage
+            }
+            
             ofLogNotice() << " Player WEAKER - Losing life!";
             // Strong bounce to prevent passing through enemy fish
             A->moveBy( nx * pushWeak,  ny * pushWeak);
@@ -526,9 +562,52 @@ void AquariumGameScene::Update(){
 }
 
 void AquariumGameScene::Draw() {
-    this->m_player->draw();
+    // Draw player with blinking effect if invincible
+    if (m_invincibilityTimer > 0) {
+        // Blink every 10 frames (fast blink)
+        if ((m_invincibilityTimer / 10) % 2 == 0) {
+            this->m_player->draw();
+        }
+    } else {
+        this->m_player->draw();
+    }
+    
     this->m_aquarium->draw();
     this->paintAquariumHUD();
+    
+    // Draw invincibility indicator
+    if (m_invincibilityTimer > 0) {
+        ofPushStyle();
+        ofSetColor(ofColor::cyan);
+        float timeLeft = m_invincibilityTimer / 60.0f; // Convert frames to seconds
+        string invincText = "INVINCIBLE: " + ofToString(timeLeft, 1) + "s";
+        float textWidth = invincText.length() * 8; // Approximate width
+        ofDrawBitmapString(invincText, (ofGetWidth() - textWidth) / 2, 30);
+        ofPopStyle();
+    }
+    
+    // Draw VICTORY image (takes priority over level-up)
+    if (m_victoryTimer > 0) {
+        if (m_victoryImage.isAllocated()) {
+            ofPushStyle();
+            ofSetColor(255, 255, 255, 255); 
+            
+            // Center and scale the victory image
+            float scale = 0.7f; // Slightly larger for victory
+            float imgWidth = m_victoryImage.getWidth() * scale;
+            float imgHeight = m_victoryImage.getHeight() * scale;
+            float x = (ofGetWidth() - imgWidth) / 2;
+            float y = (ofGetHeight() - imgHeight) / 2;
+            
+            ofEnableAlphaBlending();
+            m_victoryImage.draw(x, y, imgWidth, imgHeight);
+            ofDisableAlphaBlending();
+            
+            ofPopStyle();
+        }
+        m_victoryTimer--;
+        return; // Don't draw level-up if showing victory
+    }
     
     // Draw LEVEL UP image
     if (m_levelUpTimer > 0) {

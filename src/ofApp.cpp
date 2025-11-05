@@ -74,6 +74,10 @@ void ofApp::setup(){
     // Preload level-up image to avoid stuttering on first level-up
     aquariumScene->PreloadLevelUpImage();
     ofLogNotice() << " Level-up image preloaded!";
+    
+    // Preload victory image
+    aquariumScene->PreloadVictoryImage();
+    ofLogNotice() << "🏆 Victory image preloaded!";
 
     // Load font for game over message
     gameOverTitle.load("Verdana.ttf", 12, true, true);

@@ -31,11 +31,12 @@ class ofApp : public ofBaseApp{
 	int DEFAULT_SPEED = 3;  // Lowered from 5 so power-up boost is more noticeable
 	ofVec2f backgroundOffset = ofVec2f(0, 0);
 
-	AwaitFrames acuariumUpdate{5};		ofTrueTypeFont gameOverTitle;
-		GameEvent lastEvent;
+	AwaitFrames acuariumUpdate{5};
+	ofTrueTypeFont gameOverTitle;
+	GameEvent lastEvent;
 
 
-		ofImage backgroundImage;
+	ofImage backgroundImage;
 
 	std::unique_ptr<GameSceneManager> gameManager;
 	std::shared_ptr<AquariumSpriteManager>spriteManager;

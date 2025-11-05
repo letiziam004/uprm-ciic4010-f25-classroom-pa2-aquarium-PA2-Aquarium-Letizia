@@ -300,6 +300,13 @@ class AquariumGameScene : public GameScene {
                 m_levelUpImage.load("LevelUp!.png"); 
             }
         }
+        void PreloadVictoryImage() { 
+            if (!m_victoryImage.isAllocated()) {
+                m_victoryImage.load("You Won.png"); 
+            }
+        }
+        bool isPlayerInvincible() const { return m_invincibilityTimer > 0; }
+        void resetInvincibility() { m_invincibilityTimer = 300; } // 5 seconds
     private:
         void paintAquariumHUD();
         std::shared_ptr<PlayerCreature> m_player;
@@ -311,6 +318,10 @@ class AquariumGameScene : public GameScene {
         ofSoundPlayer* m_levelUpSound = nullptr;
         int m_levelUpTimer = 0; 
         ofImage m_levelUpImage;
+        int m_victoryTimer = 0;
+        ofImage m_victoryImage;
+        int m_invincibilityTimer = 0; // No invincibility at start, only on level-ups
+        bool m_hasWon = false;
 };
 
 
