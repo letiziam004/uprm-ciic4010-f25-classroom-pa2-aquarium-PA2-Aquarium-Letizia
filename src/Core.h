@@ -1,5 +1,5 @@
 #pragma once
-
+#include <string>
 #include <iostream>
 #include <memory>
 #include <utility>
@@ -101,7 +101,7 @@ public:
     int getSpeed() const { return m_speed; }
     void setSpeed(int speed) { m_speed = speed; }
     void setFlipped(bool flipped) {
-        if (m_sprite) {
+        if (m_sprite != nullptr) {
             m_sprite->setFlipped(flipped);
         }
     }
@@ -219,6 +219,9 @@ class GameOverScene : public GameScene {
 
 
 class GameSceneManager {
+    private:
+        std::vector<std::shared_ptr<GameScene>> m_scenes;
+        std::shared_ptr<GameScene> m_active_scene;
     public:
         void Transition(string name);
         void AddScene(std::shared_ptr<GameScene> newScene);
@@ -231,8 +234,5 @@ class GameSceneManager {
         void UpdateActiveScene();
         void DrawActiveScene();
 
-    private:
-        std::vector<std::shared_ptr<GameScene>> m_scenes;
-        std::shared_ptr<GameScene> m_active_scene;
 
 };

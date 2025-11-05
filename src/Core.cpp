@@ -131,11 +131,11 @@ void GameSceneManager::Transition(string name){
 
 void GameSceneManager::AddScene(std::shared_ptr<GameScene> newScene){
     if(this->GetScene(newScene->GetName()) != nullptr){
-        return; // this scene already exist and shouldnt be added again
+        return; 
     }
     this->m_scenes.push_back(newScene);
     if(m_active_scene == nullptr){
-        this->m_active_scene = newScene; // need to place in active scene as its the only one in existance right now
+        this->m_active_scene = newScene; 
     }
     return;
 }
@@ -145,18 +145,18 @@ std::shared_ptr<GameScene> GameSceneManager::GetActiveScene(){
 }
 
 string GameSceneManager::GetActiveSceneName(){
-    if(this->m_active_scene == nullptr){return "";} // something to handle missing activate scenes
+    if(this->m_active_scene == nullptr){return "";} 
     return this->m_active_scene->GetName();
 }
 
 void GameSceneManager::UpdateActiveScene(){
-    if(!this->HasScenes()){return;} // make sure we have a scene before we try to paint
+    if(!this->HasScenes()){return;} 
     this->m_active_scene->Update();
 
 }
 
 void GameSceneManager::DrawActiveScene(){
-    if(!this->HasScenes()){return;} // make sure we have something before Drawing it
+    if(!this->HasScenes()){return;} 
     this->m_active_scene->Draw();
 }
 

@@ -131,7 +131,7 @@ void ofApp::update(){
             hitSound.stop();
             levelUpSound.stop();
             gameOverSound.play();
-            ofLogNotice() << "Game Over! Stopping all sounds and playing game over sound";
+            ofLogNotice() << "Game Over!!!!!! Stopping all sounds and playing game over sound!";
             gameManager->Transition(GameSceneKindToString(GameSceneKind::GAME_OVER));
             return;
         }
