@@ -45,4 +45,5 @@ class ofApp : public ofBaseApp{
 	ofSoundPlayer powerUpSound;
 	ofSoundPlayer hitSound;
 	ofSoundPlayer levelUpSound;
+	ofSoundPlayer gameOverSound;
 }; 

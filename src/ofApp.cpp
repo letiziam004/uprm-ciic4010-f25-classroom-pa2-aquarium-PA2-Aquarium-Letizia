@@ -73,7 +73,7 @@ void ofApp::setup(){
     
     // Preload level-up image to avoid stuttering on first level-up
     aquariumScene->PreloadLevelUpImage();
-    ofLogNotice() << "✅ Level-up image preloaded!";
+    ofLogNotice() << " Level-up image preloaded!";
 
     // Load font for game over message
     gameOverTitle.load("Verdana.ttf", 12, true, true);
@@ -89,6 +89,7 @@ void ofApp::setup(){
     ofSetLogLevel(OF_LOG_NOTICE); // Set default log level
 
     backgroundMusic.load("Sounds/Yoshi_theme.wav");
+    backgroundMusic.setMultiPlay(false); 
     backgroundMusic.setLoop(true);
     backgroundMusic.setVolume(0.6f);
     backgroundMusic.play();
@@ -102,6 +103,11 @@ void ofApp::setup(){
     powerUpSound.load("Sounds/Power-up.mp3");
     powerUpSound.setMultiPlay(false);
     powerUpSound.setVolume(0.7f);
+    
+    // Load game over sound
+    gameOverSound.load("Sounds/Game Over.mp3");
+    gameOverSound.setMultiPlay(false);
+    gameOverSound.setVolume(1.0f);
 }
 
 //--------------------------------------------------------------
@@ -114,6 +120,14 @@ void ofApp::update(){
     if(gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)){
         auto gameScene = std::static_pointer_cast<AquariumGameScene>(gameManager->GetActiveScene());
         if(gameScene->GetLastEvent() != nullptr && gameScene->GetLastEvent()->isGameOver()){
+            // Stop all sounds and play only game over sound
+            backgroundMusic.stop();
+            biteSound.stop();
+            powerUpSound.stop();
+            hitSound.stop();
+            levelUpSound.stop();
+            gameOverSound.play();
+            ofLogNotice() << "Game Over! Stopping all sounds and playing game over sound";
             gameManager->Transition(GameSceneKindToString(GameSceneKind::GAME_OVER));
             return;
         }
