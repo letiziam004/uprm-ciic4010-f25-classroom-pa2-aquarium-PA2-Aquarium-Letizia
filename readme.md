@@ -37,3 +37,34 @@ If a partner has no commits in the repositories, they will receive a 0.
 
 # Student Notes
 If you have any bonus specs, bonus or any details the TA's should know, you should include it here:
+
+How the game works 
+
+The Power System
+
+You start at Power Level 1
+You can only eat fish weaker than you (strictly lower value)
+Eating fish increases your score and power
+You lose a life if you touch stronger fish
+You start with 3 lives - game over when they're gone
+Fish Values to Remember
+
+Small fish (white) = 1
+Blue fish = 3
+Red fish = 4
+Violet fish = 5
+Lurker fish = 6 (grows over time!)
+ZigZag/Bigger fish = 7
+Sharks = 8 (most dangerous!)
+
+Level Progression
+
+6 levels total with increasing difficulty
+Each level has a score target (10, 15, 20, 25, 35, 50)
+Reach the target to advance
+You get 5 seconds of invincibility when leveling up (flashing effect)
+Power-Ups ⚡
+
+Yellow fish(base-fish but yellow/green) = Speed boost (1.5x faster for 10 seconds)
+Spawns every 20 seconds
+Affects both you AND other fish
